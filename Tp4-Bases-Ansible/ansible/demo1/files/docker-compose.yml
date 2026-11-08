@@ -1,0 +1,7 @@
+services:
+  web:
+    image: sen5e1/webserver:1.0
+    container_name: webserver-container
+    ports:
+      - "8081:80"
+    restart: unless-stopped

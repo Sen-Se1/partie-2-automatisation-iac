@@ -1,0 +1,47 @@
+
+---
+- name: Installer Docker et Docker Compose
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+    state: present
+    update_cache: true
+
+- name: Démarrer et activer Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Vérifier si le volume Portainer existe
+  ansible.builtin.command:
+    cmd: docker volume inspect portainer_data
+  register: portainer_volume_check
+  failed_when: false
+  changed_when: false
+
+- name: Créer le volume Portainer
+  ansible.builtin.command:
+    cmd: docker volume create portainer_data
+  when: portainer_volume_check.rc != 0
+
+- name: Vérifier si Portainer existe déjà
+  ansible.builtin.command:
+    cmd: docker container inspect portainer
+  register: portainer_check
+  failed_when: false
+  changed_when: false
+
+- name: Déployer Portainer
+  ansible.builtin.command:
+    cmd: >
+      docker run -d
+      -p 8000:8000
+      -p 9443:9443
+      --name portainer
+      --restart=always
+      -v /var/run/docker.sock:/var/run/docker.sock
+      -v portainer_data:/data
+      portainer/portainer-ce:lts
+  when: portainer_check.rc != 0
