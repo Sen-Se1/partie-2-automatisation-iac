@@ -1,0 +1,44 @@
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "bento/ubuntu-24.04"
+
+  config.vm.define "web1" do |web1|
+    web1.vm.hostname = "web1"
+    web1.vm.network "private_network", ip: "192.168.56.11"
+
+    # Accès depuis Windows vers web1
+    web1.vm.network "forwarded_port", guest: 8081, host: 18081
+    web1.vm.network "forwarded_port", guest: 8080, host: 18080
+    web1.vm.network "forwarded_port", guest: 9443, host: 19443
+
+    web1.vm.provider "virtualbox" do |vb|
+      vb.name = "TP5-web1"
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+  end
+
+  config.vm.define "web2" do |web2|
+    web2.vm.hostname = "web2"
+    web2.vm.network "private_network", ip: "192.168.56.12"
+
+    # Accès depuis Windows vers web2
+    web2.vm.network "forwarded_port", guest: 8081, host: 28081
+    web2.vm.network "forwarded_port", guest: 8080, host: 28080
+    web2.vm.network "forwarded_port", guest: 9443, host: 29443
+
+    web2.vm.provider "virtualbox" do |vb|
+      vb.name = "TP5-web2"
+      vb.memory = 1024
+      vb.cpus = 1
+    end
+
+    web2.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbook.yml"
+      ansible.become = true
+      ansible.limit = "all"
+    end
+  end
+
+end

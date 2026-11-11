@@ -1,0 +1,41 @@
+
+
+---
+- name: Installer les dépendances de Jenkins
+  ansible.builtin.apt:
+    name:
+      - fontconfig
+      - openjdk-21-jre
+      - curl
+    state: present
+    update_cache: true
+
+- name: Créer le dossier des clés APT
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Télécharger la clé officielle Jenkins
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+    dest: /usr/share/keyrings/jenkins-keyring.asc
+    mode: '0644'
+
+- name: Ajouter le dépôt Jenkins LTS
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+    filename: jenkins
+    state: present
+
+- name: Installer Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    state: present
+    update_cache: true
+
+- name: Démarrer et activer Jenkins
+  ansible.builtin.service:
+    name: jenkins
+    state: started
+    enabled: true

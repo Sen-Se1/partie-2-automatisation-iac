@@ -1,0 +1,11 @@
+# Vagrant
+*.box
+.vagrant/
+**/.vagrant/
+
+# Ansible
+*.retry
+
+# Sensitive files
+*.pem
+*.key

@@ -1,0 +1,24 @@
+
+---
+- name: Créer le dossier de déploiement Web
+  ansible.builtin.file:
+    path: /opt/webapp
+    state: directory
+    mode: '0755'
+
+- name: Copier docker-compose.yml sur Webserver
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /opt/webapp/docker-compose.yml
+    mode: '0644'
+
+- name: Télécharger l'image Docker Hub
+  community.docker.docker_image:
+    name: sen5e1/webserver
+    tag: "1.0"
+    source: pull
+
+- name: Déployer le conteneur Web avec Docker Compose
+  community.docker.docker_compose_v2:
+    project_src: /opt/webapp
+    state: present

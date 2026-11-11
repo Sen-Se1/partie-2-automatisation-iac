@@ -1,0 +1,10 @@
+---
+- name: Configuration des deux machines du lab
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - jenkins_install
+    - docker_portainer_install
+    - container_deployment
